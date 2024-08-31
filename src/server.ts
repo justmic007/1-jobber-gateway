@@ -1,6 +1,6 @@
 import http from 'http';
 
-import { CustomError, IErrorResponse, winstonLogger } from '@justmic007/jobber-shared';
+import { CustomError, IErrorResponse, winstonLogger } from '@justmic007/9-jobber-shared';
 import cookieSession from 'cookie-session';
 import { Application, json, NextFunction, Request, Response, urlencoded } from 'express';
 import { Logger } from 'winston';
@@ -9,8 +9,8 @@ import hpp from 'hpp';
 import helmet from 'helmet';
 import compression from 'compression';
 import { StatusCodes } from 'http-status-codes';
-
-import { config } from './config';
+import { config } from '@gateway/config';
+import { elasticsearch } from '@gateway/elasticsearch';
 
 const SERVER_PORT = 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
@@ -63,7 +63,7 @@ export class GatewayServer {
   }
 
   private startElasticsearch(): void {
-
+    elasticsearch.checkConnection()
   }
 
   private errorHandler(app: Application): void {
