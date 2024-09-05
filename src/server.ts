@@ -12,6 +12,7 @@ import { StatusCodes } from 'http-status-codes';
 import { config } from '@gateway/config';
 import { elasticsearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
+import { axiosAuthInstance } from '@gateway/services/api/auth.service';
 
 const SERVER_PORT = 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
@@ -50,13 +51,21 @@ export class GatewayServer {
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     }));
+
+    // A middleware to add a bearer token to a request from the Client and before the API gateway sends the request to the respective microservices
+    app.use((req: Request, _res: Response, next: NextFunction) => {
+      if (req.session?.jwt) {
+        axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`
+      }
+      next()
+    })
   }
 
   // A middleware to reduce the size of the json request
   private standardMiddleware(app: Application): void {
     app.use(compression());
-    app.use(json({ limit: '200mb'}));
-    app.use(urlencoded({ extended: true, limit: '200mb'}));
+    app.use(json({ limit: '200mb' }));
+    app.use(urlencoded({ extended: true, limit: '200mb' }));
   }
 
   private routesMiddleware(app: Application): void {
@@ -71,11 +80,11 @@ export class GatewayServer {
     app.use('*', (req: Request, res: Response, next: NextFunction) => {
       const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
       log.log('error', `${fullUrl} endpoint does not exist.`, '');
-      res.status(StatusCodes.NOT_FOUND).json({ message: 'The endpoint called does not exist.'});
+      res.status(StatusCodes.NOT_FOUND).json({ message: 'The endpoint called does not exist.' });
       next();
     });
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
-      log.log('error', `GatewayService ${error.comingFrom}:` , error);
+      log.log('error', `GatewayService ${error.comingFrom}:`, error);
       if (error instanceof CustomError) {
         res.status(error.statusCode).json(error.serializedErrors());
       }
