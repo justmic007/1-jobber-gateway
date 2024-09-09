@@ -9,7 +9,7 @@ class AuthRoutes {
   }
 
   public routes(): Router {
-    this.router.get('/auth/signup', Signup.prototype.create);
+    this.router.post('/auth/signup', Signup.prototype.create);
     return this.router;
   }
 }

@@ -11,6 +11,7 @@ class AuthService {
   constructor() {
     this.axiosService = new AxiosService(`${config.AUTH_BASE_URL}/api/v1/auth`, 'auth')
     axiosAuthInstance = this.axiosService.axios
+    console.log('GOT HERE-------->');
   }
 
   async getCurrentUser(): Promise<AxiosResponse> {
@@ -35,11 +36,33 @@ class AuthService {
 
   // Methods that don't require a protected route
   async signup(body: IAuth): Promise<AxiosResponse> {
+    console.log('====================', body);
+
     const response: AxiosResponse = await this.axiosService.axios.post('/signup', body)
+    console.log('====================', response);
     return response
   }
 
+  // // Methods that don't require a protected route
+  // async signup(body: IAuth): Promise<AxiosResponse> {
+  //   console.log('==================== Body:', body);
+
+  //   try {
+  //     // Await the response and log it when ready
+  //     const response: AxiosResponse = await this.axiosService.axios.post('/signup', body);
+  //     console.log('==================== Response:', response);
+  //     return response;
+  //   } catch (error) {
+  //     // Catch and log the error if the request fails
+  //     console.error('==================== Error:', error);
+  //     throw error;
+  //   }
+  // }
+
+
   async signIn(body: IAuth): Promise<AxiosResponse> {
+    console.log({ 'body': body });
+
     const response: AxiosResponse = await this.axiosService.axios.post('/signin', body)
     return response
   }

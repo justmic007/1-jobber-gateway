@@ -3,9 +3,7 @@ import { BadRequestError, IAuthPayload, NotAuthorizedError } from '@justmic007/9
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
-
 /* This middleware here is the verification for the token between the client and the API gateway. */
-
 class AuthMiddleware {
   public verifyUser(req: Request, _res: Response, next: NextFunction): void {
     if (!req.session?.jwt) {
